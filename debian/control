@@ -1,0 +1,13 @@
+Source: ke-recv-extra
+Section: base
+Priority: optional
+Maintainer: Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+Build-Depends: debhelper (>= 4.0.0), libosso-dev, libglib2.0-dev, pkg-config, libxml-parser-perl, libgconf2-dev, osso-af-settings
+Standards-Version: 3.6.0
+
+Package: ke-recv-extra
+Architecture: any
+Depends: ${shlibs:Depends}, gconf2, hildon-status-bar-usb-l10n-mr0 | hildon-status-bar-usb-l10n-mr
+Description: Program for receiving low-memory events from the kernel etc.
+ Program for receiving low-memory events from the kernel and forwarding them
+ to the D-Bus system bus, etc.
