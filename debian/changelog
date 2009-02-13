@@ -1,6 +1,7 @@
 ke-recv-extra (0.4-3~unreleased) unstable; urgency=low
 
   * Tuned source headers a bit before open-sourcing.
+  * Removed D-Bus service file. Fixes: NB#87150
 
  -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri, 16 May 2008 16:31:28 +0300
 
