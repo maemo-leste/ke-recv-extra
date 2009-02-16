@@ -2,7 +2,7 @@ Source: ke-recv-extra
 Section: base
 Priority: optional
 Maintainer: Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
-Build-Depends: debhelper (>= 4.0.0), libosso-dev, libglib2.0-dev, pkg-config, libxml-parser-perl, libgconf2-dev, osso-af-settings
+Build-Depends: debhelper (>= 4.0.0), libosso-dev, libglib2.0-dev, pkg-config, libxml-parser-perl, libgconf2-dev, osso-af-settings, upstart-dev
 Standards-Version: 3.6.0
 
 Package: ke-recv-extra
