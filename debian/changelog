@@ -1,6 +1,14 @@
 ke-recv-extra (0.6-1~unreleased) unstable; urgency=low
 
   * Remove a bunch of auto-generated files from SVN.
+  * Disable OTG error tracking.
+  * Disable input device tracking.
+  * Fixes: NB#120150 - Entering text with virtual keyboard does not work when
+    wired headphones (model HS-48) are connected
+  * Remove some unneeded logging.
+  * Remove unsafe function calls from signal handlers.
+  * Add polling of /proc/mounts to detect read-only memory card mounting and
+    show infonote about r-o mounting if it happens, related to NB#114795.
 
  -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri,  5 Jun 2009 14:33:33 +0300
 

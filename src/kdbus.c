@@ -36,6 +36,7 @@
 #include <glib.h>
 #include <errno.h>
 #include <assert.h>
+#include <libintl.h>
 
 #ifndef NETLINK_KOBJECT_UEVENT
 #define NETLINK_KOBJECT_UEVENT 15
@@ -60,6 +61,7 @@ do { \
 
 void sysfs_change(const char *path, const char *value);
 void handle_kevent(DBusMessage* m);
+void show_infonote(const char *text);
 
 static DBusConnection* sysbus;
 static int pipe_fd;
@@ -205,6 +207,14 @@ kdbus_sock_cb(GIOChannel* ch, GIOCondition cond, gpointer not_used)
         return TRUE;
 }
 
+#define MOUNTS_FILE "/proc/mounts"
+#define INT_MMC "/home/user/MyDocs vfat"
+#define INT_MMC_RO "/home/user/MyDocs vfat ro"
+#define INT_MMC_RW "/home/user/MyDocs vfat rw"
+#define EXT_MMC "/media/mmc1 vfat"
+#define EXT_MMC_RO "/media/mmc1 vfat ro"
+#define EXT_MMC_RW "/media/mmc1 vfat rw"
+
 static gboolean
 sysfs_file_cb(GIOChannel* ch, GIOCondition cond, gpointer data)
 {
@@ -214,7 +224,70 @@ sysfs_file_cb(GIOChannel* ch, GIOCondition cond, gpointer data)
         gsize len;
         const char *file = data;
 
-        if (cond & G_IO_IN || cond & G_IO_PRI) {
+        if (strcmp(MOUNTS_FILE, file) == 0) {
+                static int ext_ro = 0;
+                static int int_ro = 0;
+
+                /*
+                ULOG_DEBUG_F(MOUNTS_FILE " changed");
+                */
+
+                /* check if either card is now read-only */
+                if (g_file_get_contents(MOUNTS_FILE, &str, NULL, NULL)) {
+                        int show_note = 0;
+
+                        if (strstr(str, INT_MMC)) {
+                                /*
+                                ULOG_DEBUG_F("internal card found");
+                                */
+                                if (!int_ro && strstr(str, INT_MMC_RO)) {
+                                        int_ro = 1;
+                                        show_note = 1;
+                                        ULOG_DEBUG_F(
+                                                "internal card is read-only");
+                                } else if (int_ro && strstr(str, INT_MMC_RW)) {
+                                        int_ro = 0;
+                                        ULOG_DEBUG_F(
+                                                "internal card is read-write");
+                                }
+                        } else
+                                int_ro = 0;
+
+                        if (strstr(str, EXT_MMC)) {
+                                /*
+                                ULOG_DEBUG_F("external card found");
+                                */
+                                if (!ext_ro && strstr(str, EXT_MMC_RO)) {
+                                        ext_ro = 1;
+                                        show_note = 1;
+                                        ULOG_DEBUG_F(
+                                                "external card is read-only");
+                                } else if (ext_ro && strstr(str, EXT_MMC_RW)) {
+                                        ext_ro = 0;
+                                        ULOG_DEBUG_F(
+                                                "external card is read-write");
+                                }
+                        } else
+                                ext_ro = 0;
+                        g_free(str);
+
+                        if (show_note) {
+                                show_infonote(dgettext("ke-recv",
+                                              "card_ia_corrupted"));
+                        }
+                }
+
+                /* seek to zero offset so that the poll() works */
+                g_io_channel_seek_position(ch, 0, G_SEEK_SET, &error);
+                if (error != NULL) {
+                        ULOG_ERR_F("g_io_channel_seek_position(): %s",
+                                   error->message);
+                        g_error_free(error);
+                        g_io_channel_unref(ch);
+                        return FALSE;
+                }
+                return TRUE;
+        } else if (cond & G_IO_IN || cond & G_IO_PRI) {
                 ret = g_io_channel_read_line(ch, &str, &len, NULL, &error);
                 if (error != NULL) {
                         ULOG_ERR_F("g_io_channel_read_line(): %s",
@@ -228,7 +301,9 @@ sysfs_file_cb(GIOChannel* ch, GIOCondition cond, gpointer data)
                         int n;
 
                         str = g_strchomp(str);
+                        /*
                         ULOG_DEBUG_F("%s: '%s'", file, str);
+                        */
                         /* make the data look like a kevent message */
                         n = snprintf(buf, PIPE_MSG_LEN, "%s@%s", str, file);
                         g_free(str);
@@ -270,7 +345,6 @@ write_again:
         } else if (cond & G_IO_ERR) {
                 ULOG_ERR_F("file error for %s", file);
                 g_io_channel_unref(ch);
-                exit(1);
         } else {
                 ULOG_ERR_F("unknown GIOCondition: %d", cond);
                 g_io_channel_unref(ch);

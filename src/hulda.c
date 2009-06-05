@@ -41,7 +41,7 @@ static DBusConnection* sys_conn = NULL, *ses_conn = NULL;
 static DBusMessage* the_message = NULL;
 
 void send_error(const char* s);
-static void show_infoprint(const char *text);
+void show_infonote(const char *text);
 
 /* strcmp() with checks for NULL pointers */
 static int strcmp2(const char* s1, const char* s2)
@@ -85,7 +85,9 @@ void sysfs_change(const char *path, const char *value)
                 handle_event(E_BGKILL_OFF_SIGNAL);
             }
         }
-    } else if (strcmp2(path, "/sys/devices/platform/musb_hdrc/usb1/otg_last_error") == 0) {
+    }
+#if 0
+    else if (strcmp2(path, "/sys/devices/platform/musb_hdrc/usb1/otg_last_error") == 0) {
         if (strncmp(value, "OTG01", 5) == 0) {
             show_infoprint(gettext("stab_me_usb_otg_not_supported"));
         } else if (strncmp(value, "OTG02", 5) == 0) {
@@ -96,6 +98,7 @@ void sysfs_change(const char *path, const char *value)
             show_infoprint(gettext("stab_me_usb_cannot_connect"));
         }
     }
+#endif
     /* invalidate */
     the_connection = NULL;
 }
@@ -104,22 +107,33 @@ void sysfs_change(const char *path, const char *value)
 #define FDO_OBJECT_PATH "/org/freedesktop/Notifications"
 #define FDO_INTERFACE "org.freedesktop.Notifications"
 
-static void show_infoprint(const char *text)
+void show_infonote(const char *text)
 {
     DBusMessage* m = NULL;
     DBusError err;
     dbus_bool_t ret;
+    char *btext = "";
+    int type = 0;
 
-    assert(ses_conn != NULL);
     dbus_error_init(&err);
+    if (!ses_conn) {
+        ses_conn = dbus_bus_get(DBUS_BUS_SESSION, &err);
+        if (!ses_conn) {
+                ULOG_ERR_F("couldn't open session bus");
+                return;
+        }
+    }
 
     m = dbus_message_new_method_call(FDO_SERVICE, FDO_OBJECT_PATH,
-                                     FDO_INTERFACE, "SystemNoteInfoprint");
+                                     FDO_INTERFACE, "SystemNoteDialog");
     if (m == NULL) {
         ULOG_ERR_F("couldn't create message");
         return;
     }
+
     ret = dbus_message_append_args(m, DBUS_TYPE_STRING, &text,
+                                   DBUS_TYPE_UINT32, &type,
+                                   DBUS_TYPE_STRING, &btext,
                                    DBUS_TYPE_INVALID);
     if (!ret) {
         ULOG_ERR_F("couldn't append arguments");
@@ -133,16 +147,20 @@ static void show_infoprint(const char *text)
         ULOG_ERR_F("dbus_connection_send failed");
         return;
     }
+    dbus_connection_flush(ses_conn);
 }
 
 /* this callback is called directly from kdbus code, the message
  * does not come from the DBus bus */
 void handle_kevent(DBusMessage* m)
 {
+#if 0  /* nothing done here because input device tracking is not needed */
+        /*
     ULOG_DEBUG_F("i|m|p: %s|%s|%s",
                  dbus_message_get_interface(m), 
                  dbus_message_get_member(m),
                  dbus_message_get_path(m));
+                 */
     the_connection = sys_conn;
     the_message = NULL; /* replying to message 'm' wouldn't work */
 
@@ -167,6 +185,7 @@ void handle_kevent(DBusMessage* m)
     }
     /* invalidate */
     the_connection = NULL;
+#endif
 }
 
 /**
@@ -177,10 +196,12 @@ DBusHandlerResult sig_handler(DBusConnection *c, DBusMessage *m,
 		              void *data)
 {
     gboolean handled = FALSE;
+    /*
     ULOG_DEBUG_L("i|m|p: %s|%s|%s",
                dbus_message_get_interface(m), 
                dbus_message_get_member(m),
                dbus_message_get_path(m));
+               */
     the_connection = c;
     the_message = m;
     if (dbus_message_is_signal(m, DBUS_PATH_LOCAL, "Disconnected")) {
@@ -307,11 +328,15 @@ static void sigchld(int signo)
 
     wait(&status);
     if (WIFEXITED(status)) {
-        ULOG_INFO_L("child exited with code %d, exiting",
+            /*
+        printf("child exited with code %d, exiting\n",
                     WEXITSTATUS(status));
+                    */
     } else if (WIFSIGNALED(status)) {
-        ULOG_INFO_L("child exited with signal %d, exiting",
+            /*
+        printf("child exited with signal %d, exiting\n",
                     WTERMSIG(status));
+                    */
     }
 
     exit(1);
@@ -339,6 +364,16 @@ int main(int argc, char* argv[])
     if (signal(SIGCHLD, sigchld) == SIG_ERR) {
       ULOG_CRIT_L("signal() failed");
       exit(1);
+    }
+
+    if (setlocale(LC_ALL, "") == NULL) {
+        ULOG_ERR_L("couldn't set locale");
+    }
+    if (bindtextdomain("hildon-status-bar-usb", LOCALEDIR) == NULL) {
+        ULOG_ERR_L("bindtextdomain() failed");
+    }
+    if (textdomain("hildon-status-bar-usb") == NULL) {
+        ULOG_ERR_L("textdomain() failed");
     }
 
     if ((child_pid = fork()) == -1) {
@@ -372,22 +407,11 @@ int main(int argc, char* argv[])
       if (sysfs_bgkill_file != NULL) {
         setup_sysfs_poll(sysfs_bgkill_file, pipefd[1]);
       }
-      setup_sysfs_poll("/sys/devices/platform/musb_hdrc/usb1/otg_last_error",
-                       pipefd[1]);
+      setup_sysfs_poll("/proc/mounts", pipefd[1]);
 
       g_main_loop_run(mainloop); 
       ULOG_DEBUG_L("Returned from the main loop");
       exit(0);
-    }
-
-    if (setlocale(LC_ALL, "") == NULL) {
-        ULOG_ERR_L("couldn't set locale");
-    }
-    if (bindtextdomain("hildon-status-bar-usb", LOCALEDIR) == NULL) {
-        ULOG_ERR_L("bindtextdomain() failed");
-    }
-    if (textdomain("hildon-status-bar-usb") == NULL) {
-        ULOG_ERR_L("textdomain() failed");
     }
 
     {
