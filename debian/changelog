@@ -1,3 +1,9 @@
+ke-recv-extra (0.6-1~unreleased) unstable; urgency=low
+
+  * Remove a bunch of auto-generated files from SVN.
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri,  5 Jun 2009 14:33:33 +0300
+
 ke-recv-extra (0.5-1) unstable; urgency=low
 
   * Tuned source headers a bit before open-sourcing.
