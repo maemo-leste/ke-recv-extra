@@ -1,4 +1,4 @@
-ke-recv-extra (0.6-1~unreleased) unstable; urgency=low
+ke-recv-extra (0.6-1) unstable; urgency=low
 
   * Remove a bunch of auto-generated files from SVN.
   * Disable OTG error tracking.
@@ -11,7 +11,7 @@ ke-recv-extra (0.6-1~unreleased) unstable; urgency=low
     show infonote about r-o mounting if it happens, related to NB#114795.
   * Silence the single compilation warning and add -Werror compilation option.
 
- -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri,  5 Jun 2009 14:33:33 +0300
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Mon, 08 Jun 2009 17:40:48 +0300
 
 ke-recv-extra (0.5-1) unstable; urgency=low
 
