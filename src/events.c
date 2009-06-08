@@ -70,23 +70,27 @@ static void handle_e_shutdown()
 
 static void handle_e_lowmem_on_signal()
 {
+        ULOG_DEBUG_F("sending lowmem_on");
         send_lowmem_state_on();
         send_user_lowmem_on_signal();
 }
 
 static void handle_e_lowmem_off_signal()
 {
+        ULOG_DEBUG_F("sending lowmem_off");
         send_lowmem_state_off();
         send_user_lowmem_off_signal();
 }
 
 static void handle_e_bgkill_on_signal()
 {
+        ULOG_DEBUG_F("sending bgkill_on");
         send_bgkill_on_signal();
 }
 
 static void handle_e_bgkill_off_signal()
 {
+        ULOG_DEBUG_F("sending bgkill_off");
         send_bgkill_off_signal();
 }
 

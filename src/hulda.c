@@ -3,7 +3,7 @@
 
   This file is part of ke-recv-extra.
 
-  Copyright (C) 2004-2008 Nokia Corporation. All rights reserved.
+  Copyright (C) 2004-2009 Nokia Corporation. All rights reserved.
 
   Author: Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 
@@ -27,6 +27,7 @@
 #include <config.h>
 #include "hulda.h"
 #include "events.h"
+#include <dbus/dbus-glib-lowlevel.h>
 
 const char* sysfs_lowmem_file = NULL;
 const char* sysfs_bgkill_file = NULL;

@@ -9,6 +9,7 @@ ke-recv-extra (0.6-1~unreleased) unstable; urgency=low
   * Remove unsafe function calls from signal handlers.
   * Add polling of /proc/mounts to detect read-only memory card mounting and
     show infonote about r-o mounting if it happens, related to NB#114795.
+  * Silence the single compilation warning and add -Werror compilation option.
 
  -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri,  5 Jun 2009 14:33:33 +0300
 
