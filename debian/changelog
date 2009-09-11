@@ -1,3 +1,9 @@
+ke-recv-extra (0.7-1) unstable; urgency=low
+
+  * Fixes: NB#138145 - hulda (ke-recv-extra) listens on D-Bus too broadly
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri, 11 Sep 2009 16:23:06 +0300
+
 ke-recv-extra (0.6-1) unstable; urgency=low
 
   * Remove a bunch of auto-generated files from SVN.

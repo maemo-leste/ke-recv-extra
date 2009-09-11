@@ -437,9 +437,10 @@ int main(int argc, char* argv[])
 	exit(1);
       }
 
-      dbus_bus_add_match(conn, MCE_MATCH_RULE, &error);
+      dbus_bus_add_match(conn, MCE_SHUTDOWN_SIG_MATCH_RULE, &error);
       if (dbus_error_is_set(&error)) {
-        ULOG_CRIT_L("dbus_bus_add_match for %s failed", MCE_MATCH_RULE);
+        ULOG_CRIT_L("dbus_bus_add_match for %s failed",
+                    MCE_SHUTDOWN_SIG_MATCH_RULE);
 	exit(1);
       }
       dbus_connection_setup_with_g_main(sys_conn, NULL);
