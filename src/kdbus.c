@@ -182,28 +182,25 @@ read_again:
 static GIOChannel *pipe_channel;
 
 static gboolean
-kdbus_sock_cb(GIOChannel* ch, GIOCondition cond, gpointer not_used)
+kdbus_sock_read_cb(GIOChannel* ch, GIOCondition cond, gpointer not_used)
 {
-        switch (cond) {
-                case G_IO_ERR:
-                        ULOG_ERR_F("error for FD %d",
-                                   g_io_channel_unix_get_fd(ch));
-                        return FALSE;
-                case G_IO_HUP:
-                        ULOG_ERR_F("SIGHUP from FD %d",
-                                   g_io_channel_unix_get_fd(ch));
-                        return FALSE;
-                case G_IO_IN:
-                        if (ch == pipe_channel) {
-                                return read_from_pipe(ch);
-                        } else {
-                                return read_from_socket(ch);
-                        }
-                default:
-                        ULOG_ERR_F("unknown GIOCondition %d for FD %d",
-                                   cond, g_io_channel_unix_get_fd(ch));
-                        break;
+        if (cond & G_IO_IN) {
+                if (ch == pipe_channel) {
+                        return read_from_pipe(ch);
+                } else {
+                        return read_from_socket(ch);
+                }
         }
+
+        return TRUE;
+}
+
+static gboolean
+kdbus_sock_event_cb(GIOChannel *ch, GIOCondition cond, gpointer not_used)
+{
+        if (cond & (G_IO_HUP | G_IO_ERR))
+                return FALSE;
+
         return TRUE;
 }
 
@@ -457,8 +454,10 @@ void kdbus_init(DBusConnection* sysbus_connection, int pipefd)
                 exit(1);
         }
 	g_io_channel_set_buffered(gioch, FALSE);
-        g_io_add_watch(gioch, G_IO_IN | G_IO_ERR | G_IO_HUP,
-                       kdbus_sock_cb, NULL);
+        g_io_add_watch(gioch, G_IO_IN,
+                       kdbus_sock_read_cb, NULL);
+        g_io_add_watch(gioch, G_IO_ERR | G_IO_HUP,
+                       kdbus_sock_event_cb, NULL);
 
         /* set up reading from the pipe */
         pipe_channel = g_io_channel_unix_new(pipefd);
@@ -473,7 +472,9 @@ void kdbus_init(DBusConnection* sysbus_connection, int pipefd)
                 exit(1);
         }
 	g_io_channel_set_buffered(pipe_channel, FALSE);
-        g_io_add_watch(pipe_channel, G_IO_IN | G_IO_ERR | G_IO_HUP,
-                       kdbus_sock_cb, NULL);
+        g_io_add_watch(gioch, G_IO_IN,
+                       kdbus_sock_read_cb, NULL);
+        g_io_add_watch(gioch, G_IO_ERR | G_IO_HUP,
+                       kdbus_sock_event_cb, NULL);
 }
 
