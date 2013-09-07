@@ -1,3 +1,10 @@
+ke-recv-extra (0.7-1+0m5) unstable; urgency=low
+
+  * This entry has been added by BIFH queue processor
+    Suffix +0m5 added to package revision
+
+ -- Kojo Aapo <aapo.kojo@nokia.com>  Tue, 15 Sep 2009 13:41:47 +0300
+
 ke-recv-extra (0.7-1) unstable; urgency=low
 
   * Fixes: NB#138145 - hulda (ke-recv-extra) listens on D-Bus too broadly
