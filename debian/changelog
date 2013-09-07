@@ -1,3 +1,9 @@
+ke-recv-extra (0.7-2+cssu0) unstable; urgency=low
+
+  * Fixes: hulda 100% CPU usage on 3.x kernels
+
+ -- Ivaylo Dimitrov <freemangordon@abv.bg>  Sat, 07 Sep 2013 17:27:22 +0300
+
 ke-recv-extra (0.7-1+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
