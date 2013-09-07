@@ -274,6 +274,7 @@ sysfs_file_cb(GIOChannel* ch, GIOCondition cond, gpointer data)
                         }
                 }
 
+#if 0
                 /* seek to zero offset so that the poll() works */
                 g_io_channel_seek_position(ch, 0, G_SEEK_SET, &error);
                 if (error != NULL) {
@@ -283,6 +284,7 @@ sysfs_file_cb(GIOChannel* ch, GIOCondition cond, gpointer data)
                         g_io_channel_unref(ch);
                         return FALSE;
                 }
+#endif
                 return TRUE;
         } else if (cond & G_IO_IN || cond & G_IO_PRI) {
                 ret = g_io_channel_read_line(ch, &str, &len, NULL, &error);
@@ -395,8 +397,13 @@ void setup_sysfs_poll(const char *file, int pipefd)
         }
 
         pipe_fd = pipefd;
-        g_io_add_watch(gioch, G_IO_IN | G_IO_PRI | G_IO_ERR,
-                       sysfs_file_cb, (gpointer)file);
+        if(!strcmp(file, MOUNTS_FILE)) {
+                g_io_add_watch(gioch, G_IO_ERR,
+                               sysfs_file_cb, (gpointer)file);
+        } else {
+                g_io_add_watch(gioch, G_IO_IN | G_IO_PRI | G_IO_ERR,
+                               sysfs_file_cb, (gpointer)file);
+        }
 }
 
 void kdbus_init(DBusConnection* sysbus_connection, int pipefd);
