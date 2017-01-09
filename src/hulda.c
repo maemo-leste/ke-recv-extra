@@ -382,7 +382,9 @@ int main(int argc, char* argv[])
       exit(1);
     } else if (child_pid != 0) {
       /* the parent */
+#if !GLIB_CHECK_VERSION(2,35,0)
       g_type_init();
+#endif
       mainloop = g_main_loop_new(NULL, TRUE);
       ULOG_OPEN(APPL_NAME);
       close(pipefd[1]); /* close writing end */
