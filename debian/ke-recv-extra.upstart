@@ -1,6 +1,6 @@
 description "starting hulda"
 author "Philippe De Swert"
-start on started hildon-desktop
+start on started dbus and started dsme
 stop on ACT_DEAD
 console none
 script
