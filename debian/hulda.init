@@ -20,7 +20,7 @@
 
 ### BEGIN INIT INFO
 # Provides:		hulda
-# Required-Start:	$all
+# Required-Start:	hildon-desktop
 # Required-Stop:
 # Default-Start:	2 3 4
 # Default-Stop:		0 1 5 6
