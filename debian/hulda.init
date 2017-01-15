@@ -18,6 +18,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+### BEGIN INIT INFO
+# Provides:		hulda
+# Required-Start:	$all
+# Required-Stop:
+# Default-Start:	2 3 4
+# Default-Stop:		0 1 5 6
+# Short-Description:	hulda
+# Description:		Kernel UEvents to D-Bus system daemon proxy etc.
+### END INIT INFO
+
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/hulda
 NAME=hulda
