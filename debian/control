@@ -11,3 +11,10 @@ Depends: ${shlibs:Depends}, gconf2, hildon-status-bar-usb-l10n-mr0 | hildon-stat
 Description: Program for receiving low-memory events from the kernel etc.
  Program for receiving low-memory events from the kernel and forwarding them
  to the D-Bus system bus, etc.
+
+Package: ke-recv-extra-dbg
+Architecture: any
+Depends: ke-recv-extra (= ${binary:Version})
+Description: Program for receiving low-memory events from the kernel etc. - debug symbols
+ Program for receiving low-memory events from the kernel and forwarding them
+ to the D-Bus system bus, etc. - debug symbols
