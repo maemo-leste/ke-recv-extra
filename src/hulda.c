@@ -431,7 +431,8 @@ int main(int argc, char* argv[])
       /* sesison bus is needed for the FDO infobanners */
       ses_conn = dbus_bus_get(DBUS_BUS_SESSION, &error);
       if (ses_conn == NULL) {
-	      ULOG_CRIT_L("Failed to get session bus connection");
+	      ULOG_CRIT_L("Failed to get session bus connection %s",
+			  error.message);
 	      exit(1);
       }
       if (!dbus_connection_add_filter(conn, sig_handler, NULL, NULL)) {
