@@ -107,6 +107,10 @@ read_again:
 
 	buf[len] = '\0';
 
+	/* Ignore libudev messages */
+	if (len >= 8 && !memcmp(buf, "libudev", 8))
+	  return TRUE;
+
 	/* sending object */
 	pos = strchr(buf, '@');
 	pos[0] = '\0';
