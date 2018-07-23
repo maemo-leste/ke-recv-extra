@@ -30,9 +30,7 @@ extern "C" {
 #endif
 
 #define INPUT_DEVICE_OP "/org/kernel/class/input/input"
-#define INPUT_DEVICE_SYSFS_FILE "/sys/class/input/event"
-#define INPUT_DEVICE_BUILTIN_EVENTS 3
-#define INPUT_DEVICE_MAX_DEVICES 4
+#define INPUT_DEVICE_DIR "/dev/input"
 
 /**
   Returns state of the input devices.
@@ -49,16 +47,6 @@ void reread_input_device_state(void);
   Initialises the input device state.
 */
 void init_input_device_state(void);
-
-/**
-  Increase input device reference count.
-*/
-void input_device_ref(void);
-
-/**
-  Decrease input device reference count.
-*/
-void input_device_unref(void);
 
 #ifdef __cplusplus
 }
