@@ -1,1 +1,11 @@
-Nothing here
+The Kernel Receiver (ke-recv)
+=============================
+Kernel events proxy. Binary name: hulda
+
+Description
+===========
+* Receiving low-memory events from the kernel and forwarding them to the
+  D-Bus system bus, etc.
+* Detecting if a keyboard is currently attached, which will set a gconf
+  value, which will then instruct virtual keyboard to do the right
+  thing.
