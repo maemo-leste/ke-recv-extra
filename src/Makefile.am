@@ -1,15 +1,9 @@
 sbin_PROGRAMS = hulda
 
-INCLUDES = \
-	`pkg-config --cflags libosso` \
-	`pkg-config --cflags glib-2.0` \
-	`pkg-config --cflags gconf-2.0` \
-	`pkg-config --cflags dbus-1` \
-	`pkg-config --cflags dbus-glib-1` \
-	-DLOCALEDIR=\"`pkg-config --variable=localedir osso-af-settings`\"
+INCLUDES = -DLOCALEDIR=\"$(LOCALEDIR)\"
 
-hulda_LDFLAGS = \
-	`pkg-config --libs gconf-2.0 dbus-glib-1`
+hulda_CFLAGS= $(GLIB_CFLAGS) $(GCONF_CFLAGS) $(DBUS_GLIB_CFLAGS) $(DBUS_CFLAGS) $(OSSO_CFLAGS)
+hulda_LDADD = $(GLIB_LIBS) $(GCONF_LIBS) $(DBUS_GLIB_LIBS) $(DBUS_LIBS) $(OSSO_LIBS)
 
 hulda_SOURCES = \
         hulda.h \
