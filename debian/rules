@@ -5,10 +5,8 @@
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-CFLAGS = -DOSSOLOG_COMPILE -Wall -g -Werror \
-         -Wmissing-prototypes -Wcast-align
-
-CPPFLAGS = -DBONOBO_DISABLE_DEPRECATED \
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=923626
+DEB_CPPFLAGS_APPEND = -DBONOBO_DISABLE_DEPRECATED \
            -DBONOBO_UI_DISABLE_DEPRECATED \
 	   -DEEL_DISABLE_DEPRECATED \
 	   -DGCONF_DISABLE_DEPRECATED \
@@ -19,11 +17,16 @@ CPPFLAGS = -DBONOBO_DISABLE_DEPRECATED \
 	   -DGTK_DISABLE_DEPRECATED \
 	   -DLIBGLADE_DISABLE_DEPRECATED
 
+DEB_CFLAGS_APPEND = -DOSSOLOG_COMPILE -Wall -g -Werror \
+         -Wmissing-prototypes -Wcast-align $(DEB_CPPFLAGS_APPEND)
+
+
+export DEB_CFLAGS_APPEND
+export DEB_CPPLAGS_APPEND
+
 %:
 	dh $@
 
-override_dh_auto_configure:
-	CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" dh_auto_configure
 
 override_dh_install:
 	# Add here commands to install the package into debian/ke-recv-extra.
