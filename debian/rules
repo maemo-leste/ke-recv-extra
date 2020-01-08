@@ -22,7 +22,10 @@ CPPFLAGS = -DBONOBO_DISABLE_DEPRECATED \
 %:
 	dh $@
 
-override_dh_install: build
+override_dh_auto_configure:
+	CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" dh_auto_configure
+
+override_dh_install:
 	# Add here commands to install the package into debian/ke-recv-extra.
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	# hack the package to work
