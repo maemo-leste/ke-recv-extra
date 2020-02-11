@@ -23,11 +23,15 @@
   02110-1301 USA
 */
 
+#include <gio/gio.h>
+
 #include "hulda.h"
 #include "events.h"
 
 static gboolean global_init_done = FALSE;
 static GConfClient* gconfclient;
+GFile *dev_input_gfp = NULL;
+GFileMonitor *dev_input_gfmp = NULL;
 
 static void inform_keyboard_attached(gboolean value)
 {
@@ -41,6 +45,36 @@ static void inform_keyboard_attached(gboolean value)
         }
 }
 
+static void dir_changed_cb(GFileMonitor *monitor,
+                           GFile *file,
+                           GFile *other_file,
+                           GFileMonitorEvent event_type,
+                           gpointer user_data) {
+    handle_event(E_INPUT_DEVICE_CHANGED);
+}
+
+static int init_event_monitor()
+{
+    GError *error = NULL;
+
+    dev_input_gfp = g_file_new_for_path(DEV_INPUT_PATH);
+
+    if ((dev_input_gfmp = g_file_monitor_directory(dev_input_gfp,
+                               G_FILE_MONITOR_NONE,
+                               NULL, &error)) == NULL) {
+        ULOG_WARN_F("Unable to register input event monitor: %s", error->message);
+        g_object_unref(dev_input_gfp);
+        g_clear_error(&error);
+        return 0;
+    }
+    g_object_unref(dev_input_gfp);
+
+    g_signal_connect(G_OBJECT(dev_input_gfmp), "changed",
+             G_CALLBACK(dir_changed_cb), NULL);
+
+    return 1;
+}
+
 static void do_global_init()
 {
         gconfclient = gconf_client_get_default();
@@ -48,6 +82,10 @@ static void do_global_init()
         init_lowmem_state();
         init_bgkill_state();
         init_input_device_state();
+
+        if (!init_event_monitor()) {
+            ULOG_WARN_F("Failed to init event monitor");
+        }
 
         if (get_input_device_state() == INPUT_DEVICE_ATTACHED) {
                 inform_keyboard_attached(TRUE);
@@ -94,16 +132,10 @@ static void handle_e_bgkill_off_signal()
         send_bgkill_off_signal();
 }
 
-static void handle_e_input_device_attached(void)
-{      
-        inform_keyboard_attached(TRUE);
-}
- 
-static void handle_e_input_device_detached(void)
+static void handle_e_input_device_changed(void)
 {
-        if (get_input_device_state() != INPUT_DEVICE_ATTACHED) {
-               inform_keyboard_attached(FALSE);
-        }
+        reread_input_device_state();
+        inform_keyboard_attached(get_input_device_state() == INPUT_DEVICE_ATTACHED);
 }
 
 void handle_event(mmc_event_t e)
@@ -127,11 +159,8 @@ void handle_event(mmc_event_t e)
     case E_BGKILL_OFF_SIGNAL:
             handle_e_bgkill_off_signal();
             break;
-    case E_INPUT_DEVICE_ATTACHED:
-            handle_e_input_device_attached();
-            break;
-    case E_INPUT_DEVICE_DETACHED:
-            handle_e_input_device_detached();
+    case E_INPUT_DEVICE_CHANGED:
+            handle_e_input_device_changed();
             break;
     default:
 	    ULOG_WARN_F("Unknown event %d, shouldn't ever happen", e);

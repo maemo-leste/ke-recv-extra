@@ -36,6 +36,8 @@ extern "C" {
 
 #define KEYBOARD_ATTACHED_KEY "/system/osso/af/keyboard-attached"
 
+#define DEV_INPUT_PATH "/dev/input"
+
 typedef enum {
         E_STARTUP,
         E_SHUTDOWN,
@@ -43,8 +45,7 @@ typedef enum {
         E_LOWMEM_OFF_SIGNAL,
         E_BGKILL_ON_SIGNAL,
         E_BGKILL_OFF_SIGNAL,
-        E_INPUT_DEVICE_ATTACHED,
-        E_INPUT_DEVICE_DETACHED
+        E_INPUT_DEVICE_CHANGED
 } mmc_event_t;
 
 /**
