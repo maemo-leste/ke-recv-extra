@@ -65,14 +65,14 @@ static int init_event_monitor()
         ULOG_WARN_F("Unable to register input event monitor: %s", error->message);
         g_object_unref(dev_input_gfp);
         g_clear_error(&error);
-        return 1;
+        return 0;
     }
     g_object_unref(dev_input_gfp);
 
     g_signal_connect(G_OBJECT(dev_input_gfmp), "changed",
              G_CALLBACK(dir_changed_cb), NULL);
 
-    return 0;
+    return 1;
 }
 
 static void do_global_init()
@@ -83,7 +83,7 @@ static void do_global_init()
         init_bgkill_state();
         init_input_device_state();
 
-        if (init_event_monitor()) {
+        if (!init_event_monitor()) {
             ULOG_WARN_F("Failed to init event monitor");
         }
 
