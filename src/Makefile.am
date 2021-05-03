@@ -1,17 +1,13 @@
 sbin_PROGRAMS = hulda
 
-hulda_CFLAGS = \
-	$(GIO_CFLAGS) $(GCONF_CFLAGS) $(DBUSGLIB_CFLAGS) $(DBUS_CFLAGS) \
-	$(GLIB_CFLAGS) $(LIBOSSO_CFLAGS) \
-	-DLOCALEDIR=\"`pkg-config --variable=localedir osso-af-settings`\"
+AM_CPPFLAGS = -DLOCALEDIR=\"$(LOCALEDIR)\"
 
-hulda_LDFLAGS = \
-	$(GIO_LIBS) $(GCONF_LIBS) $(DBUSGLIB_LIBS) $(DBUS_LIBS) \
-	$(GLIB_LIBS) $(LIBOSSO_LIBS)
+hulda_CFLAGS = $(KERECV_CFLAGS)
+hulda_LDFLAGS = $(KERECV_LIBS)
 
 hulda_SOURCES = \
-        hulda.h \
-        events.h \
+	hulda.h \
+	events.h \
 	lowmem-state.h \
 	input-device.h \
 	hulda.c \
