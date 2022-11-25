@@ -3,7 +3,7 @@ sbin_PROGRAMS = hulda
 AM_CPPFLAGS = -DLOCALEDIR=\"$(LOCALEDIR)\"
 
 hulda_CFLAGS = $(KERECV_CFLAGS)
-hulda_LDFLAGS = $(KERECV_LIBS)
+hulda_LDADD = $(KERECV_LIBS)
 
 hulda_SOURCES = \
 	hulda.h \
